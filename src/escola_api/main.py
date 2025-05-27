@@ -1,12 +1,27 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, date
 
 import uvicorn
+from dataclasses_json import dataclass_json, LetterCase
 from fastapi import FastAPI, HTTPException, status
 from fastapi.openapi.models import Response
 from fastapi.openapi.utils import status_code_ranges
+from pydantic import BaseModel, Field
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:4200",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # POST, GET, PUT, DELETE, PATCH, OPTIONS, HEAD
+    allow_headers=["*"]
+)
 
 
 @app.get("/")
@@ -129,6 +144,88 @@ def editar_curso(id: int, form: CursoEditar):
             curso.sigla = form.sigla
             return curso
     raise HTTPException(status_code=404, detail=f"Curso não encontrado com id: {id}")
+
+
+# poetry add pydantic
+class Aluno(BaseModel):
+    id: int = Field()
+    nome: str = Field()
+    sobrenome: str = Field()
+    cpf: str = Field()
+    data_nascimento: datetime = Field(alias="dataNascimento")
+
+
+class AlunoCadastro(BaseModel):
+    nome: str = Field()
+    sobrenome: str = Field()
+    cpf: str = Field()
+    data_nascimento: datetime = Field(alias="dataNascimento")
+
+
+class AlunoEditar(BaseModel):
+    nome: str = Field()
+    sobrenome: str = Field()
+    cpf: str = Field()
+    data_nascimento: datetime = Field(alias="dataNascimento")
+
+
+alunos = [
+    # instanciando um objeto da Class Aluno
+    Aluno(id=1, nome="João", sobrenome="Diniz", cpf="062.950.959-55", dataNascimento=date(1990, 5, 25))
+]
+
+
+@app.get("/api/alunos")
+def listar_todos_alunos():
+    return alunos
+
+
+@app.get("/api/alunos/{id}")
+def obter_por_id_alunos(id: int):
+    for aluno in alunos:
+        if aluno.id == id:
+            return aluno
+
+    # Lançando uma exceção com o status code de 404(não encontrado)
+    raise HTTPException(status_code=404, detail=f"Aluno não encontrado com id: {id}")
+
+
+@app.post("/api/alunos")
+def cadastrar_aluno(form: AlunoCadastro):
+    ultimo_id = max([aluno.id for aluno in alunos], default=0)
+
+    # instanciar um objeto da classe Aluno
+    aluno = Aluno(
+        id=ultimo_id + 1,
+        nome=form.nome,
+        sobrenome=form.sobrenome,
+        cpf=form.cpf,
+        data_nascimento=form.data_nascimento)
+
+    alunos.append(aluno)
+
+    return aluno
+
+
+@app.delete("/api/alunos/{id}", status_code=204)
+def apagar_aluno(id: int):
+    for aluno in alunos:
+        if aluno.id == id:
+            alunos.remove(aluno)
+            return
+    raise HTTPException(status_code=404, detail=f"Aluno não encontrado com id: {id}")
+
+
+@app.put("/api/alunos/{id}")
+def editar_aluno(id: int, form: AlunoEditar):
+    for aluno in alunos:
+        if aluno.id == id:
+            aluno.nome = form.nome
+            aluno.sobrenome = form.sobrenome
+            aluno.cpf = form.cpf
+            aluno.data_nascimento = form.data_nascimento
+            return aluno
+    raise HTTPException(status_code=404, detail=f"Aluno não encontrado com id: {id}")
 
 
 if __name__ == "__main__":
