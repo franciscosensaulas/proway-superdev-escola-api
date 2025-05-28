@@ -1,11 +1,8 @@
-from dataclasses import dataclass, field
 from datetime import datetime, date
+from typing import Optional
 
 import uvicorn
-from dataclasses_json import dataclass_json, LetterCase
-from fastapi import FastAPI, HTTPException, status
-from fastapi.openapi.models import Response
-from fastapi.openapi.utils import status_code_ranges
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 
@@ -61,29 +58,20 @@ def processar_dados_cliente(nome: str, idade: int, sobrenome: str):
     }
 
 
-# class CursoTradicional:
-#     def __init__(self, id: int, nome: str, sigla: str):
-#         self.id = id
-#         self.nome = nome
-#         self.sigla = sigla
-# from dataclasses import dataclass, field
-@dataclass
-class Curso:
-    id: int = field()
-    nome: str = field()
-    sigla: str = field()
+class Curso(BaseModel):
+    id: int = Field()
+    nome: str = Field()
+    sigla: Optional[str] = Field(default=None)
 
 
-@dataclass
-class CursoCadastro:
-    nome: str = field()
-    sigla: str = field()
+class CursoCadastro(BaseModel):
+    nome: str = Field()
+    sigla: Optional[str] = Field(default=None)
 
 
-@dataclass
-class CursoEditar:
-    nome: str = field()
-    sigla: str = field()
+class CursoEditar(BaseModel):
+    nome: str = Field()
+    sigla: Optional[str] = Field(default=None) # campo opcional
 
 
 cursos = [
@@ -146,7 +134,7 @@ def editar_curso(id: int, form: CursoEditar):
     raise HTTPException(status_code=404, detail=f"Curso não encontrado com id: {id}")
 
 
-# poetry add pydantic
+# Entidade
 class Aluno(BaseModel):
     id: int = Field()
     nome: str = Field()
@@ -200,7 +188,7 @@ def cadastrar_aluno(form: AlunoCadastro):
         nome=form.nome,
         sobrenome=form.sobrenome,
         cpf=form.cpf,
-        data_nascimento=form.data_nascimento)
+        dataNascimento=form.data_nascimento)
 
     alunos.append(aluno)
 
