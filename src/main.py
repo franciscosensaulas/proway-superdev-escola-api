@@ -1,7 +1,7 @@
 import uvicorn
 
-from escola_api.database.banco_dados import Base, engine
-from escola_api.api.v1 import aluno_controller
+from src.escola_api.database.banco_dados import Base, engine
+from src.escola_api.api.v1 import aluno_controller
 from src.escola_api.api.v1 import curso_controller
 from src.escola_api.app import app
 

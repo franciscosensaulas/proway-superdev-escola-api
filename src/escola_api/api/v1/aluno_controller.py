@@ -3,8 +3,6 @@ from datetime import date
 from fastapi import HTTPException
 
 from src.escola_api.app import router
-from src.escola_api.database.banco_dados import SessionLocal
-from src.escola_api.database.modelos import Curso
 from src.escola_api.schemas.aluno_schemas import Aluno, AlunoEditar, AlunoCadastro
 
 alunos = [
@@ -12,20 +10,9 @@ alunos = [
     Aluno(id=1, nome="João", sobrenome="Diniz", cpf="062.950.959-55", dataNascimento=date(1990, 5, 25))
 ]
 
-# Função de dependência para obter uma sessão do banco de dados
-def get_db():
-    db = SessionLocal()  # Cria uma nova sessão do banco de dados
-    try:
-        yield db  # Retorna a sessão de forma que o FastAPI possa utilizá-la nas rotas
-    finally:
-        db.close()  # Garante que a sessão será fechada após o uso
 
-
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, Depends
 @router.get("/api/alunos")
-def listar_todos_alunos(db: Session = Depends(get_db)):
-    alunos = db.query(Curso).all()
+def listar_todos_alunos():
     return alunos
 
 
