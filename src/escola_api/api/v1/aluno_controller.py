@@ -17,13 +17,20 @@ def get_db():
         db.close()  # Garante que a sessão será fechada após o uso
 
 
-@router.get("/api/alunos")
+@router.get("/api/alunos", tags=["alunos"])
 def listar_todos_alunos(db: Session = Depends(get_db)):
     alunos = db.query(AlunoEntidade).all()
-    return alunos
+    alunos_response = [Aluno(
+            id=aluno.id,
+            nome=aluno.nome,
+            sobrenome=aluno.sobrenome,
+            cpf=aluno.cpf,
+            data_nascimento=aluno.data_nascimento,
+        ) for aluno in alunos]
+    return alunos_response
 
 
-@router.get("/api/alunos/{id}")
+@router.get("/api/alunos/{id}", tags=["alunos"])
 def obter_por_id_alunos(id: int, db: Session = Depends(get_db)):
     aluno = db.query(AlunoEntidade).filter(AlunoEntidade.id == id).first()
     if aluno:
@@ -38,7 +45,7 @@ def obter_por_id_alunos(id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail=f"Aluno não encontrado com id: {id}")
 
 
-@router.post("/api/alunos")
+@router.post("/api/alunos", tags=["alunos"])
 def cadastrar_aluno(form: AlunoCadastro, db: Session = Depends(get_db)):
     # instanciar um objeto da classe AlunoEntidade
     aluno = AlunoEntidade(
@@ -54,7 +61,7 @@ def cadastrar_aluno(form: AlunoCadastro, db: Session = Depends(get_db)):
     return aluno
 
 
-@router.delete("/api/alunos/{id}", status_code=204)
+@router.delete("/api/alunos/{id}", status_code=204, tags=["alunos"])
 def apagar_aluno(id: int, db: Session = Depends(get_db)):
     aluno = db.query(AlunoEntidade).filter(AlunoEntidade.id == id).first()
     if aluno:
@@ -64,7 +71,7 @@ def apagar_aluno(id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail=f"Aluno não encontrado com id: {id}")
 
 
-@router.put("/api/alunos/{id}")
+@router.put("/api/alunos/{id}", tags=["alunos"])
 def editar_aluno(id: int, form: AlunoEditar, db: Session = Depends(get_db)):
     aluno = db.query(AlunoEntidade).filter(AlunoEntidade.id == id).first()
     if aluno:

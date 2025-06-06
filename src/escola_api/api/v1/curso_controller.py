@@ -16,7 +16,7 @@ def get_db():
         db.close()  # Garante que a sessão será fechada após o uso
 
 
-@router.get("/api/cursos")
+@router.get("/api/cursos", tags=["cursos"])
 def listar_todos_cursos(db: Session = Depends(get_db)):
     cursos = db.query(CursoEntidade).all()
     return cursos
@@ -28,7 +28,7 @@ def listar_todos_cursos(db: Session = Depends(get_db)):
 # U => update   => Método put
 # D => delete   => Método delete
 
-@router.post("/api/cursos")
+@router.post("/api/cursos", tags=["cursos"])
 def cadastrar_curso(form: CursoCadastro, db: Session = Depends(get_db)):
     # instanciar um objeto da classe Curso
     curso = CursoEntidade(nome=form.nome, sigla=form.sigla)
@@ -39,7 +39,7 @@ def cadastrar_curso(form: CursoCadastro, db: Session = Depends(get_db)):
     return curso
 
 
-@router.delete("/api/cursos/{id}", status_code=204)
+@router.delete("/api/cursos/{id}", status_code=204, tags=["cursos"])
 def apagar_curso(id: int, db: Session = Depends(get_db)):
     curso = db.query(CursoEntidade).filter(CursoEntidade.id == id).first()
     if curso:
@@ -49,7 +49,7 @@ def apagar_curso(id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail=f"Curso não encontrado com id: {id}")
 
 
-@router.put("/api/cursos/{id}", status_code=200)
+@router.put("/api/cursos/{id}", status_code=200, tags=["cursos"])
 def editar_curso(id: int, form: CursoEditar, db: Session = Depends(get_db)):
     curso = db.query(CursoEntidade).filter(CursoEntidade.id == id).first()
     if curso:
@@ -61,7 +61,7 @@ def editar_curso(id: int, form: CursoEditar, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail=f"Curso não encontrado com id: {id}")
 
 
-@router.get("/api/cursos/{id}")
+@router.get("/api/cursos/{id}", tags=["cursos"])
 def obter_por_id_curso(id: int, db: Session = Depends(get_db)):
     curso = db.query(CursoEntidade).filter(CursoEntidade.id == id).first()
     if curso:
