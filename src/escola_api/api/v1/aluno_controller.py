@@ -3,30 +3,21 @@ from fastapi.params import Depends
 from sqlalchemy.orm import Session
 
 from src.escola_api.app import router
-from src.escola_api.database.banco_dados import SessionLocal
 from src.escola_api.database.modelos import AlunoEntidade
+from src.escola_api.dependencias import get_db
 from src.escola_api.schemas.aluno_schemas import Aluno, AlunoEditar, AlunoCadastro
-
-
-# Função de dependência para obter uma sessão do banco de dados
-def get_db():
-    db = SessionLocal()  # Cria uma nova sessão do banco de dados
-    try:
-        yield db  # Retorna a sessão de forma que o FastAPI possa utilizá-la nas rotas
-    finally:
-        db.close()  # Garante que a sessão será fechada após o uso
 
 
 @router.get("/api/alunos", tags=["alunos"])
 def listar_todos_alunos(db: Session = Depends(get_db)):
     alunos = db.query(AlunoEntidade).all()
     alunos_response = [Aluno(
-            id=aluno.id,
-            nome=aluno.nome,
-            sobrenome=aluno.sobrenome,
-            cpf=aluno.cpf,
-            data_nascimento=aluno.data_nascimento,
-        ) for aluno in alunos]
+        id=aluno.id,
+        nome=aluno.nome,
+        sobrenome=aluno.sobrenome,
+        cpf=aluno.cpf,
+        data_nascimento=aluno.data_nascimento,
+    ) for aluno in alunos]
     return alunos_response
 
 

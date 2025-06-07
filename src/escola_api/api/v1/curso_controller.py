@@ -2,18 +2,9 @@ from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from src.escola_api.app import router
-from src.escola_api.database.banco_dados import SessionLocal
 from src.escola_api.database.modelos import CursoEntidade
+from src.escola_api.dependencias import get_db
 from src.escola_api.schemas.curso_schemas import CursoEditar, CursoCadastro
-
-
-# Função de dependência para obter uma sessão do banco de dados
-def get_db():
-    db = SessionLocal()  # Cria uma nova sessão do banco de dados
-    try:
-        yield db  # Retorna a sessão de forma que o FastAPI possa utilizá-la nas rotas
-    finally:
-        db.close()  # Garante que a sessão será fechada após o uso
 
 
 @router.get("/api/cursos", tags=["cursos"])
