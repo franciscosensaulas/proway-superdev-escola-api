@@ -18,5 +18,5 @@ class MatriculaCadastro(MatriculaBase):
     pass
 
 
-class MatriculaCadastro(BaseModel):
+class MatriculaEditar(BaseModel):
     curso_id: int = Field()
