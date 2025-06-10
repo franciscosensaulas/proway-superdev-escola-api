@@ -21,4 +21,3 @@ INSERT INTO `matriculas` (`aluno_id`, `curso_id`, `data_matricula`) VALUES
   (1, 2, '2025-05-04'),
   (7, 1, '2025-01-28'),
   (5, 6, '2025-06-09');
-
