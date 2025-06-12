@@ -1,18 +1,30 @@
 from datetime import date
 
 from fastapi import Depends, HTTPException
+from fastapi.params import Query
 from sqlalchemy.orm import Session
 
 from src.escola_api.app import router
 from src.escola_api.database.modelos import MatriculaEntidade
 from src.escola_api.dependencias import get_db
-from src.escola_api.schemas.matricula_schemas import MatriculaCadastro, Matricula, MatriculaEditar
+from src.escola_api.schemas.matricula_schemas import MatriculaCadastro, Matricula, MatriculaEditar, MatriculaAluno
 
 
 @router.get("/api/matriculas", status_code=200, tags=["matriculas"])
-def listar_todas_matriculas(db: Session = Depends(get_db)):
-    matriculas = db.query(MatriculaEntidade).all()
-    return matriculas
+def listar_todas_matriculas(id_curso: int = Query(alias="idCurso"), db: Session = Depends(get_db)):
+    matriculas = db.query(MatriculaEntidade).filter(MatriculaEntidade.curso_id == id_curso).all()
+
+    return [Matricula(
+        id=matricula.id,
+        aluno_id=matricula.aluno_id,
+        aluno=MatriculaAluno(
+            id=matricula.aluno.id,
+            nome=matricula.aluno.nome,
+            sobrenome=matricula.aluno.sobrenome
+        ),
+        curso_id=matricula.curso_id,
+        dataMatricula=matricula.data_matricula,
+    ) for matricula in matriculas]
 
 
 @router.post("/api/matriculas", status_code=200, tags=["matriculas"])
@@ -52,7 +64,7 @@ def editar_matricula(id: int, form: MatriculaEditar, db: Session = Depends(get_d
 
 @router.get("/api/matriculas/{id}", status_code=200, tags=["matriculas"])
 def obter_por_id_matricula(id: int, db: Session = Depends(get_db)):
-    matricula : MatriculaEntidade = db.query(MatriculaEntidade).get(id)
+    matricula: MatriculaEntidade = db.query(MatriculaEntidade).get(id)
 
     if matricula:
         return matricula

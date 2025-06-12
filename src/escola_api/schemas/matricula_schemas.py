@@ -9,8 +9,18 @@ class MatriculaBase(BaseModel):
 
 
 # listagem, obter por id (get)
+class MatriculaAluno(BaseModel):
+    nome: str = Field()
+    sobrenome: str = Field()
+    id: int = Field()
+
 class Matricula(MatriculaBase):
     data_matricula: date = Field(alias="dataMatricula")
+    aluno: MatriculaAluno = Field()
+    id: int = Field()
+
+    class Config:
+        populate_by_name = True
 
 
 # cadastro (post)
